@@ -1,5 +1,5 @@
-# Open Firewall Port 8000
-New-NetFirewallRule -DisplayName "HTTP(S) Inbound" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8000 -Force
+# Open Firewall Port 8000 
+New-NetFirewallRule -DisplayName "HTTP(S) Inbound" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8000
 
 # Create PowerShell HTTP Server Script (Equivalent to 'server.py')
 $serverScript = @"

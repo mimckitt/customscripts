@@ -1,21 +1,10 @@
 # Define the script path
 $scriptPath = "$env:TEMP\server.ps1"
 
-# Open firewall for port 8000
-$firewallRuleName = "PowerShell HTTP Server 8000"
-$existingRule = Get-NetFirewallRule -DisplayName $firewallRuleName -ErrorAction SilentlyContinue
-
-if (-not $existingRule) {
-    New-NetFirewallRule -DisplayName $firewallRuleName -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8000
-    Write-Host "Firewall rule created: $firewallRuleName"
-} else {
-    Write-Host "Firewall rule already exists: $firewallRuleName"
-}
-
 # Create the PowerShell HTTP Server Script
 $serverScript = @"
 `$Hso = New-Object Net.HttpListener
-`$Hso.Prefixes.Add('http://+:8000/')  # Allow external access
+`$Hso.Prefixes.Add('http://localhost:8000/')
 `$Hso.Start()
 
 Write-Host 'Starting server on port 8000...'
@@ -30,13 +19,13 @@ function GenerateResponseJson {
         }
     } | ConvertTo-Json -Depth 10) -replace "`n", "" -replace "\s{2,}", ""  # Ensuring a single-line JSON string
 
-    # Create main JSON response
+# Create main JSON response
     `$response = @{
         'ApplicationHealthState' = 'Healthy'
         'CustomMetrics' = `$customMetricsJson  # Embed JSON string inside JSON
     }
 
-    return (`$response | ConvertTo-Json -Depth 10)
+return (`$response | ConvertTo-Json -Depth 10)
 }
 
 # Keep the server running

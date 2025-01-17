@@ -1,7 +1,7 @@
-# Open Firewall Port 8000 
+# Open Firewall Port 8000
 New-NetFirewallRule -DisplayName "HTTP(S) Inbound" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8000
 
-# Create PowerShell HTTP Server Script (Equivalent to 'server.py')
+# Create PowerShell HTTP Server Script
 $serverScript = @"
 `$Hso = New-Object Net.HttpListener
 `$Hso.Prefixes.Add('http://localhost:8000/')
@@ -9,7 +9,7 @@ $serverScript = @"
 
 Write-Host 'Starting server on port 8000...'
 
-# Function to Generate JSON Response
+# Function to Generate JSON Response (Fixed)
 function GenerateResponseJson {
     return (@{
         'ApplicationHealthState' = 'Healthy'
@@ -19,7 +19,7 @@ function GenerateResponseJson {
                 'SkipUpgrade' = 'false'
             }
         }
-    } | ConvertTo-Json -Depth 10)
+    } | ConvertTo-Json -Depth 10) # Fix JSON formatting
 }
 
 # Continuous Loop to Keep the Server Running

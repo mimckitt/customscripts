@@ -9,11 +9,12 @@ $serverScript = @"
 
 Write-Host 'Starting server on port 8000...'
 
-# Function to Generate JSON Response (Fixed to match Python format)
+# Function to Generate JSON Response (Matching Python Format)
 function GenerateResponseJson {
     # Create JSON string for CustomMetrics
     `$customMetricsJson = (@{
         'RollingUpgrade' = @{
+            'PhaseOrderingNumber' = 1
             'SkipUpgrade' = 'false'
         }
     } | ConvertTo-Json -Depth 10) -replace "`n", "" -replace "\s{2,}", ""  # Ensuring a single-line JSON string

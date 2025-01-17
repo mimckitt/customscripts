@@ -11,15 +11,19 @@ Write-Host 'Starting server on port 8000...'
 
 # Function to Generate JSON Response (Fixed)
 function GenerateResponseJson {
-    return (@{
-        'ApplicationHealthState' = 'Healthy'
-        'CustomMetrics' = @{
-            'RollingUpgrade' = @{
-                'PhaseOrderingNumber' = 1
-                'SkipUpgrade' = 'false'
-            }
+    `$customMetrics = @{
+        'RollingUpgrade' = @{
+            'PhaseOrderingNumber' = 1
+            'SkipUpgrade' = 'false'
         }
-    } | ConvertTo-Json -Depth 10) # Fix JSON formatting
+    }
+
+    `$response = @{
+        'ApplicationHealthState' = 'Healthy'
+        'CustomMetrics' = `$customMetrics # Ensuring it's a proper JSON object
+    }
+
+    return (`$response | ConvertTo-Json -Depth 10)
 }
 
 # Continuous Loop to Keep the Server Running
@@ -46,8 +50,4 @@ $scriptPath = "$env:TEMP\server.ps1"
 $serverScript | Set-Content -Path $scriptPath -Encoding UTF8
 
 # Run the PowerShell HTTP Server as a Background Process
-Start-Process -NoNewWindow -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`"" -PassThru | ForEach-Object {
-    # Store Process ID
-    $SERVER_PID = $_.Id
-    Write-Host "Server has been started on port 8000 with PID $SERVER_PID"
-}
+Start-Process -NoNewWindow -FilePa

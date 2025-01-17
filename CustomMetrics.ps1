@@ -6,12 +6,14 @@ $Hso = New-Object Net.HttpListener
 $Hso.Prefixes.Add('http://localhost:8000/')
 $Hso.Start()
 
-Write-Host "HTTP Listener started on http://localhost:8000/. Waiting for requests..."
+# Display message indicating the listener is active
+Write-Host "HTTP Listener is now listening on http://localhost:8000/ ..."
 
 # Function to Generate JSON Response
 function GenerateResponseJson() {
+    $appHealthState = "Healthy"
     $hashTable = @{
-        'ApplicationHealthState' = "Healthy"
+        'ApplicationHealthState' = $appHealthState
         'CustomMetrics' = @{
             'RollingUpgrade' = @{
                 'PhaseOrderingNumber' = 1
@@ -41,6 +43,7 @@ while ($Hso.IsListening) {
         $response.OutputStream.Write($responseBytes, 0, $responseBytes.Length)
         $response.Close()
 
+        # Log request in console
         Write-Host "Responded to request at $(Get-Date)"
     }
     catch {

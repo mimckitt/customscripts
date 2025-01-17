@@ -40,5 +40,14 @@ if __name__ == "__main__":
     run()
 EOF
 
-# Run the server
-python3 server.py
+# Run the server in the background
+python3 server.py &
+
+# Store the process ID of the server
+SERVER_PID=$!
+
+# Wait a few seconds to ensure the server starts
+sleep 2
+
+# Confirm execution
+echo "Server has been started on port 8000 with PID $SERVER_PID"

@@ -1,7 +1,7 @@
-# Open Firewall Port 8000
-New-NetFirewallRule -DisplayName "HTTP(S) Inbound" -Direction Inbound -Action Allow -Protocol TCP -LocalPort 8000
+# Define the script path
+$scriptPath = "$env:TEMP\server.ps1"
 
-# Create PowerShell HTTP Server Script
+# Create the PowerShell HTTP Server Script
 $serverScript = @"
 `$Hso = New-Object Net.HttpListener
 `$Hso.Prefixes.Add('http://localhost:8000/')
@@ -9,7 +9,7 @@ $serverScript = @"
 
 Write-Host 'Starting server on port 8000...'
 
-# Function to Generate JSON Response (Fixed)
+# Function to Generate JSON Response
 function GenerateResponseJson {
     `$customMetrics = @{
         'RollingUpgrade' = @{
@@ -20,13 +20,13 @@ function GenerateResponseJson {
 
     `$response = @{
         'ApplicationHealthState' = 'Healthy'
-        'CustomMetrics' = `$customMetrics # Ensuring it's a proper JSON object
+        'CustomMetrics' = `$customMetrics
     }
 
     return (`$response | ConvertTo-Json -Depth 10)
 }
 
-# Continuous Loop to Keep the Server Running
+# Keep the server running
 while (`$Hso.IsListening) {
     try {
         `$context = `$Hso.GetContext()
@@ -45,9 +45,17 @@ while (`$Hso.IsListening) {
 }
 "@
 
-# Save the script as 'server.ps1'
-$scriptPath = "$env:TEMP\server.ps1"
-$serverScript | Set-Content -Path $scriptPath -Encoding UTF8
+# Write script to file
+$serverScript | Out-File -FilePath $scriptPath -Encoding UTF8
 
-# Run the PowerShell HTTP Server as a Background Process
-Start-Process -NoNewWindow -FilePa
+# Verify if the file exists before starting the process
+if (Test-Path $scriptPath) {
+    Write-Host "Server script successfully created at $scriptPath"
+    Start-Process -NoNewWindow -FilePath "powershell.exe" -ArgumentList "-ExecutionPolicy Bypass -File `"$scriptPath`"" -PassThru | ForEach-Object {
+        # Store Process ID
+        $SERVER_PID = $_.Id
+        Write-Host "Server has been started on port 8000 with PID $SERVER_PID"
+    }
+} else {
+    Write-Host "Error: Server script not found at $scriptPath"
+}
